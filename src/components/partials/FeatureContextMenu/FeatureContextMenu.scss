@@ -1,0 +1,38 @@
+.feature-context-menu {
+   &.feature-context-menu-visible {
+      display: flex;
+   }
+
+   display: none;
+   flex-direction: column;
+   background-color: #ffffff;
+   box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+   position: absolute;
+   z-index: 9999;
+   padding: 5px;
+   max-height: 325px;
+   overflow-y: auto;
+
+   .feature {
+      display: flex;
+      align-items: center;
+      padding: 5px;
+      cursor: pointer;
+      font-size: 13px;
+
+      &:hover {
+         background-color: #eeeeee;
+      }
+
+      img,
+      .no-legend {
+         width: 25px;
+         height: 25px;
+         margin-right: 5px;
+      }
+
+      .label {
+         white-space: nowrap;
+      }
+   }
+}

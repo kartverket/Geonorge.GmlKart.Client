@@ -1,0 +1,16 @@
+.upload {
+   input {
+      display: none;
+   }
+
+   span {      
+      cursor: pointer;
+      font-weight: 500;      
+      user-select: none;
+      text-decoration: underline;
+
+      &:hover {
+         text-decoration: none;
+      }
+   }
+}

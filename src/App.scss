@@ -1,0 +1,97 @@
+.app {
+   display: flex;
+   flex-direction: column;
+   text-align: left;
+   margin: auto;
+   position: relative;
+   background-color: #f7f7f7;
+
+   &.api-loading .content {
+      opacity: 0.25;
+   }
+}
+
+.content {
+   display: flex;
+   position: relative;
+
+   .left-content {
+      display: flex;
+      flex-direction: column;
+      width: 400px;
+
+      .box {
+         border-left: 0 !important;
+         border-right: 1px solid #8aaec3;
+         border-top: 0 !important;
+         position: static;
+      }
+   }
+
+   .right-content {
+      flex-grow: 1;
+      position: relative;
+
+      .box {
+         border: 0;
+         right: 0;
+         align-items: flex-end;
+         background: transparent;
+
+         .box-header {
+            background-color: #8aaec3;
+            color: #ffffff;
+            font-weight: 500;
+
+            &::after {
+               background: url("assets/gfx/icon-arrow-white.svg") no-repeat center;
+               background-size: 11px;
+            }
+         }
+
+         .box-content {
+            border: 1px solid #8aaec3;
+            background: #ffffff;
+            border-right: 0;
+            width: 100%;
+         }
+      }
+   }
+}
+
+.box {
+   font-size: 13px;
+   position: absolute;
+   display: flex;
+   flex-direction: column;
+   border: 1px solid #8aaec3;
+   background-color: #ffffff;
+   z-index: 999;
+
+   .box-header {
+      display: flex;
+      line-height: 16px;
+      padding: 7px 15px;
+      border-bottom: 1px solid #8aaec3;
+      background-color: #f1f1f1;
+   }
+
+   .box-content {
+      padding: 10px 15px;
+
+      .box-row {
+         display: flex;
+         margin-bottom: 5px;
+
+         .label {
+            width: 35%;
+         }
+
+         .value {
+            width: 65%;
+            max-height: 200px;
+            overflow-y: auto;
+         }
+      }
+   }
+}

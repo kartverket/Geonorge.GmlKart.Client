@@ -1,0 +1,85 @@
+.feature-info {
+   border-top: 0 !important;
+   position: absolute;
+   top: 0;
+   right: 0;
+   width: 450px;
+
+   .box-header::after {
+      transform: rotate(-90deg) !important;
+   }
+
+   &:not(.box-expanded) {
+      width: 100px !important;
+
+      .box-header {
+         border-bottom: 0 !important;
+         justify-content: center;
+
+         &::after {
+            transform: rotate(90deg) !important;
+         }      
+      }
+
+      .box-content {
+         display: none !important;
+      }
+   }
+
+   .feature {
+      margin-bottom: 30px;
+
+      .box-row {
+         margin-bottom: 3px !important;
+      }
+
+      &:last-child {
+         margin-bottom: 0;
+      }
+   }
+
+   .header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+
+      img,
+      .no-legend {
+         width: 33px;
+         height: 33px;
+         margin-right: 10px;
+      }
+
+      .name {
+         font-size: 13px;
+         font-weight: 500;
+         margin-right: 5px;
+      }
+
+      .zoom {
+         background: url("../../../assets/gfx/icon-zoom.svg") no-repeat center center;
+         width: 33px;
+         height: 33px;
+         border: 0;
+         padding: 0;
+      }
+   }
+
+   .error-messages {
+      margin-top: 10px;
+
+      h5 {
+         font-weight: 500;
+         margin-bottom: 5px;
+         font-size: 13px;
+         color: #db3636;
+      }
+
+      ol {
+         padding: 0 12px;
+         margin-bottom: 0;
+         max-height: 150px;
+         overflow-y: auto;
+      }
+   }
+}

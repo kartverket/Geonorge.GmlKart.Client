@@ -1,0 +1,11 @@
+.default-dialog {
+   width: 600px !important;
+}
+
+.error-dialog {
+   max-width: 600px !important;
+
+   .modal-header {
+      background-color: #d9534f;
+   }
+}

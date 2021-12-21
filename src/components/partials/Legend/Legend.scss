@@ -1,0 +1,36 @@
+.legend {
+   border-bottom: 0 !important;
+   flex-grow: 1;
+
+   .box-content {
+      padding: 15px !important;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      height: 1px;      
+      min-height: 0;
+   }
+
+   .symbols {
+      min-height: 0;
+      overflow-y: auto;
+      border: 1px dashed #d5d5d5;
+      padding: 10px;      
+   }
+
+   .symbol {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+
+      &:last-child {
+         margin-bottom: 0;
+      }
+
+      img {
+         width: 25px;
+         height: 25px;
+         margin: 0 5px;
+      }
+   }
+}
