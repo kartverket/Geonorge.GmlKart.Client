@@ -1,10 +1,11 @@
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { FeatureContextMenu, FeatureInfo, Legend, MapInfo, ValidationErrors } from 'components/partials';
 import { ZoomToExtent } from 'ol/control';
 import { click } from 'ol/events/condition';
 import { Select } from 'ol/interaction';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { addLegendToFeatures, highlightSelectedFeatures, toggleFeatures } from 'utils/map/features';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleFeatureInfo } from 'store/slices/mapSlice';
+import { addGeometryInfo, addLegendToFeatures, highlightSelectedFeatures, toggleFeatures } from 'utils/map/features';
 import { debounce, getLayer } from 'utils/map/helpers';
 import { createLegend } from 'utils/map/legend';
 import { createMap } from 'utils/map/map';
@@ -20,14 +21,17 @@ function MapView({ mapDocument }) {
    const symbol = useSelector(state => state.map.symbol);
    const sidebar = useSelector(state => state.map.sidebar);
    const sidebarVisible = useRef(true);
+   const dispatch = useDispatch();
    const mapElement = useRef();
 
    const selectFeature = useCallback(
       features => {
+         addGeometryInfo(features);
          highlightSelectedFeatures(map, features);
          setSelectedFeatures([...features]);
+         dispatch(toggleFeatureInfo({ expanded: true }));
       },
-      [map]
+      [map, dispatch]
    );
 
    const addMapInteraction = useCallback(

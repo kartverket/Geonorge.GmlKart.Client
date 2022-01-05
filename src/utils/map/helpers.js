@@ -2,8 +2,9 @@ import { extend, getCenter } from 'ol/extent';
 import colorsys from 'colorsys';
 import detect from 'detect-file-type';
 import filesize from 'filesize';
+import { getArea, getLength } from 'ol/sphere';
 
-const MAX_ZOOM = process.env.MAX_ZOOM;
+const MAX_ZOOM = process.env.REACT_APP_MAX_ZOOM;
 const VALID_MIME = process.env.REACT_APP_VALID_MIME;
 
 export function getLayer(map, id) {
@@ -32,12 +33,25 @@ export function zoomTo(map, features) {
       extend(featureExtent, features[i].getGeometry().getExtent());
    }
 
+   zoom(map, featureExtent);
+}
+
+export function zoomToPoint(map, feature) {
+   const layer = getLayer(map, 'selected-features');
+   const selectedFeature = getFeatureById(layer, feature.get('id'));
+   const zoomTo = selectedFeature.get('zoomTo');
+   const extent = zoomTo.getExtent();
+
+   zoom(map, extent);
+}
+
+function zoom(map, extent) {
    const view = map.getView();
-   const resolution = view.getResolutionForExtent(featureExtent);
+   const resolution = view.getResolutionForExtent(extent);
    const zoom = view.getZoomForResolution(resolution);
 
    view.animate({
-      center: getCenter(featureExtent),
+      center: getCenter(extent),
       duration: 1000
    });
 
@@ -101,6 +115,26 @@ export async function isValidFileType(file) {
             });
          });
    })
+}
+
+export function getAreaFormatted(polygon) {
+   const area = getArea(polygon);
+
+   if (area > 10000) {
+      return `${Math.round((area / 1000000) * 100) / 100} km²`.replace('.', ',');
+   }
+
+   return `${Math.round(area * 100) / 100} m²`.replace('.', ',');
+}
+
+export function getLengthFormatted(line) {
+   const length = getLength(line);
+
+   if (length > 100) {
+      return `${Math.round((length / 1000) * 100) / 100} km`.replace('.', ',');
+   }
+
+   return `${Math.round(length * 100) / 100} m`.replace('.', ',');
 }
 
 export const getFileSize = size => filesize(size, { separator: ',', spacer: ' ' });

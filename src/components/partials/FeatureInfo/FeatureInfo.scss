@@ -81,5 +81,15 @@
          max-height: 150px;
          overflow-y: auto;
       }
+
+      span[role=button] {
+         color: #db3636;
+         text-decoration: underline;
+         margin-left: 10px;
+
+         &:hover {
+            text-decoration: none;
+         }
+      }
    }
 }
