@@ -29,44 +29,5 @@
    .rules {
       max-height: 450px;
       overflow-y: auto;
-
-      .rule {
-         margin-bottom: 15px;
-
-         &:last-child {
-            margin-bottom: 0;
-         }
-
-         .rule-name {
-            font-style: italic;
-         }
-
-         .messages {
-            line-height: 150%;
-            font-size: 12px;
-            margin: 5px 0;
-            padding: 5px 0 5px 20px;
-            max-height: 300px;
-            overflow-y: auto;
-            margin-right: 25px;
-            border: 1px dashed #dddddd;
-
-            li {
-               padding: 5px 10px;
-               transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
-
-               &:hover {
-                  background-color: #ebebeb;
-               }
-            }
-
-            .btn-link {
-               text-align: left;
-               font-size: 13px !important;
-               text-decoration: none;
-               color: #333333;
-            }
-         }
-      }
    }
 }

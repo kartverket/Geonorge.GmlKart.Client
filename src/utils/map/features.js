@@ -140,21 +140,39 @@ export function addValidationResultToFeatures(mapDocument, features) {
 }
 
 function getHighlightStyle(feature) {
-   return [
-      new Style({
-         stroke: new Stroke({ 
-            color: feature.get('errorMessages')?.length ? 'rgb(255 0 0 / 50%)' : 'rgb(0 109 173 / 50%)',
-            lineCap: 'butt', 
-            width: 5 
+   const stroke = new Stroke({
+      color: feature.get('errorMessages')?.length ? 'rgb(255 0 0 / 50%)' : 'rgb(0 109 173 / 50%)',
+      lineCap: 'butt',
+      width: 5,
+   });
+
+   let style;
+
+   if (feature.getGeometry().getType() === 'Point') {
+      const image = feature.getStyle()[0].getImage();
+      
+      style = new Style({
+         image: new Circle({
+            radius: image.getRadius(),
+            fill: image.getFill(),
+            stroke
          })
-      }), 
+      });
+   } else {
+      style = new Style({ 
+         stroke 
+      });
+   }
+
+   return [
+      style,
       new Style({
          geometry: 'zoomTo',
          image: new Circle({
             radius: 8,
             fill: new Fill({ color: 'rgb(255 0 0 / 50%)' }),
             stroke: new Stroke({
-               color: 'black', 
+               color: 'black',
                width: 2
             })
          })

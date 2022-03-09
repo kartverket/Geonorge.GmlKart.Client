@@ -1,0 +1,75 @@
+.rule {
+   margin-bottom: 15px;
+
+   &:last-child {
+      margin-bottom: 0;
+   }
+
+   .rule-name {
+      font-style: italic;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+
+      span {
+         user-select: none;
+         border-bottom: 1px solid transparent;
+         max-width: 92%;
+         overflow: hidden;
+         white-space: nowrap;
+         text-overflow: ellipsis;
+      
+         &:hover {
+            border-bottom: 1px solid #212529;       
+         }
+      }
+
+      &::after {
+         content: "";
+         background: url('../../../assets/gfx/icon-arrow.svg') no-repeat center;
+         width: 11px;
+         height: 11px;
+         background-size: 11px;
+         margin-left: 10px;
+         transform: rotate(90deg);
+         transition: all 0.25s ease;
+      }
+   }
+   
+   &.rule-collapsed {
+      .rule-name::after {
+         transform: rotate(0deg);
+      }
+   
+      .messages {
+         display: none;
+      }
+   }
+
+   .messages {
+      line-height: 150%;
+      font-size: 12px;
+      margin: 5px 0;
+      padding: 5px 0 5px 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-right: 25px;
+      border: 1px dashed #dee2e6;
+
+      li {
+         padding: 5px 10px;
+         transition: background-color 0.15s ease-in-out, border-color 0.15s ease-in-out;
+
+         &:hover {
+            background-color: #ebebeb;
+         }
+      }
+
+      .btn-link {
+         text-align: left;
+         font-size: 13px !important;
+         text-decoration: none;
+         color: #333333;
+      }
+   }
+}

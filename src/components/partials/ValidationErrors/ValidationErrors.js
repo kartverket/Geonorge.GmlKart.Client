@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Button } from 'react-bootstrap';
 import { getFeatureById, getLayer, zoomTo } from 'utils/map/helpers';
+import { Rule } from 'components/partials';
 import './ValidationErrors.scss';
 
 function ValidationErrors({ map, validationResult, onMessageClick }) {
@@ -44,26 +44,7 @@ function ValidationErrors({ map, validationResult, onMessageClick }) {
          <div className="box-content">
             <div className="rules">
                {
-                  rules.map(rule => {
-                     return (
-                        <div className="rule" key={rule.id}>
-                           <div className="rule-name">{rule.id}: {rule.name} ({rule.messages.length})</div>
-                           <ol className="messages">
-                              {
-                                 rule.messages.map((message, index) => {
-                                    const messageId = `${rule.id}-${index}`;
-
-                                    return (
-                                       <li key={messageId}>
-                                          <Button variant="link" onClick={() => handleMessageClick(message.gmlIds)}>{message.message}</Button>
-                                       </li>
-                                    );
-                                 })
-                              }
-                           </ol>
-                        </div>
-                     );
-                  })
+                  rules.map((rule, index) => <Rule key={'rule-' + index} rule={rule} onMessageClick={handleMessageClick} />)
                }
             </div>
          </div>
