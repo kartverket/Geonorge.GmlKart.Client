@@ -1,14 +1,25 @@
-import { useState } from 'react';
-import { getSymbolById, zoomTo } from 'utils/map/helpers';
+import { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { toggleFeatureInfo } from 'store/slices/mapSlice';
+import { getSymbolById, zoomTo, zoomToPoint } from 'utils/map/helpers';
 import featuresConfig from 'config/features.config';
 import get from 'lodash.get';
 import './FeatureInfo.scss';
 
 function FeatureInfo({ map, features, legend }) {
-   const [expanded, setExpanded] = useState(true);
+   const [expanded, setExpanded] = useState(false);
+   const featureInfo = useSelector(state => state.map.featureInfo);
+   const dispatch = useDispatch();
+
+   useEffect(
+      () => {
+         setExpanded(featureInfo.expanded);
+      },
+      [featureInfo]
+   );
 
    function toggle() {
-      setExpanded(!expanded);
+      dispatch(toggleFeatureInfo({ expanded: !expanded }));
    }
 
    function getFeatureInfo(feature) {
@@ -37,6 +48,30 @@ function FeatureInfo({ map, features, legend }) {
       );
    }
 
+   function getGeometryInfo(feature) {
+      let label, value;
+      const area = feature.get('_area');
+      const length = feature.get('_length');
+
+      if (area) {
+         label = 'Areal';
+         value = area;
+      } else if (length) {
+         label = 'Lengde';
+         value = length;
+      } else {
+         return null;
+      }
+
+      return (
+         <div className="box-row">
+            <div className="label">{label}:</div>
+            <div className="value">{value}</div>
+         </div>
+      );
+   }
+
+
    function getSymbolImage(id) {
       return getSymbolById(legend, id)?.image;
    }
@@ -52,7 +87,18 @@ function FeatureInfo({ map, features, legend }) {
          <div className="error-messages">
             <h5>Valideringsfeil:</h5>
             <ol>
-               {errorMessages.map((message, index) => <li key={`${feature.get('id')}-error-${index}`}>{message}</li>)}
+               {errorMessages.map((message, index) => {
+                  return (
+                     <li key={`${feature.get('id')}-error-${index}`}>
+                        {message.message}
+                        {
+                           message.zoomTo ?
+                              <span role="button" onClick={() => zoomToPoint(map, feature)}>Zoom til punkt</span> :
+                              null
+                        }
+                     </li>
+                  )
+               })}
             </ol>
          </div>
       );
@@ -87,6 +133,8 @@ function FeatureInfo({ map, features, legend }) {
                         </div>
 
                         {getFeatureInfo(feature)}
+
+                        {getGeometryInfo(feature)}
 
                         {getErrorMessages(feature)}
                      </div>

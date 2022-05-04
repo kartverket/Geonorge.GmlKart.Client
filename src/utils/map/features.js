@@ -1,5 +1,8 @@
-import { Stroke, Style } from 'ol/style';
-import { getFeaturesByName, getLayer, groupBy } from './helpers';
+import { GeometryCollection } from 'ol/geom';
+import { Stroke, Style, Fill, Circle } from 'ol/style';
+import GeometryType from 'ol/geom/GeometryType';
+import { getAreaFormatted, getFeaturesByName, getLayer, getLengthFormatted, groupBy } from './helpers';
+import WKT from 'ol/format/WKT';
 
 export function toggleFeatures(legend, map) {
    const vectorLayer = getLayer(map, 'features');
@@ -24,6 +27,30 @@ export function toggleFeature(feature) {
    feature.set('visible', visible);
 }
 
+export function addGeometryInfo(features) {
+   features.forEach(feature => {
+      const geometry = feature.getGeometry();
+      const geometryType = geometry.getType();
+
+      switch (geometryType) {
+         case GeometryType.POLYGON:
+         case GeometryType.MULTI_POLYGON:
+            if (!feature.get('_area')) {
+               feature.set('_area', getAreaFormatted(geometry));
+            }
+            break;
+         case GeometryType.LINE_STRING:
+         case GeometryType.MULTI_LINE_STRING:
+            if (!feature.get('_length')) {
+               feature.set('_length', getLengthFormatted(geometry));
+            }
+            break;
+         default:
+            break;
+      }
+   });
+}
+
 export function highlightSelectedFeatures(map, features) {
    const featureLayer = getLayer(map, 'selected-features');
    const layerSource = featureLayer.getSource();
@@ -32,13 +59,29 @@ export function highlightSelectedFeatures(map, features) {
 
    const selectedFeatures = features.map(feature => {
       const cloned = feature.clone();
-      const styles = getHighlightStyle(cloned);
+      const errorMessages = feature.get('errorMessages');
 
+      if (errorMessages) {
+         const wktPoints = errorMessages
+            .filter(message => message.zoomTo)
+            .map(message => message.zoomTo);
+
+         if (wktPoints.length) {
+            const format = new WKT();
+            const geometries = wktPoints.map(wkt => format.readGeometry(wkt));
+            const geoCollection = new GeometryCollection();
+
+            geoCollection.setGeometries(geometries);
+            cloned.set('zoomTo', geoCollection);
+         }
+      }
+
+      const styles = getHighlightStyle(cloned);
       cloned.setStyle(styles);
 
       return cloned;
    });
-         
+
    layerSource.addFeatures(selectedFeatures);
 }
 
@@ -57,10 +100,10 @@ export function addLegendToFeatures(features, legend) {
       const feats = groupedFeatures[featureName];
 
       for (let j = 0; j < feats.length; j++) {
-         const feature = feats[j];         
+         const feature = feats[j];
          feature.set('symbolId', symbol.id);
-      }      
-   }  
+      }
+   }
 }
 
 export function addValidationResultToFeatures(mapDocument, features) {
@@ -87,21 +130,52 @@ export function addValidationResultToFeatures(mapDocument, features) {
             const errorMessages = feature.get('errorMessages');
 
             if (!errorMessages) {
-               feature.set('errorMessages', [message.message]);
+               feature.set('errorMessages', [{ message: message.message, zoomTo: message.zoomTo }]);
             } else {
-               errorMessages.push(message.message);
+               errorMessages.push({ message: message.message, zoomTo: message.zoomTo });
             }
          }
-      }      
+      }
    }
 }
 
 function getHighlightStyle(feature) {
-   return new Style({
-      stroke: new Stroke({ 
-         color: feature.get('errorMessages')?.length ? 'rgb(255 0 0 / 50%)' : 'rgb(0 109 173 / 50%)',
-         lineCap: 'butt', 
-         width: 5 
-      })
+   const stroke = new Stroke({
+      color: feature.get('errorMessages')?.length ? 'rgb(255 0 0 / 50%)' : 'rgb(0 109 173 / 50%)',
+      lineCap: 'butt',
+      width: 5,
    });
+
+   let style;
+
+   if (feature.getGeometry().getType() === 'Point') {
+      const image = feature.getStyle()[0].getImage();
+      
+      style = new Style({
+         image: new Circle({
+            radius: image.getRadius(),
+            fill: image.getFill(),
+            stroke
+         })
+      });
+   } else {
+      style = new Style({ 
+         stroke 
+      });
+   }
+
+   return [
+      style,
+      new Style({
+         geometry: 'zoomTo',
+         image: new Circle({
+            radius: 8,
+            fill: new Fill({ color: 'rgb(255 0 0 / 50%)' }),
+            stroke: new Stroke({
+               color: 'black',
+               width: 2
+            })
+         })
+      })
+   ];
 }

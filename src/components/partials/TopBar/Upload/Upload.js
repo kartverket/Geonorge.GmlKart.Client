@@ -35,7 +35,7 @@ function Upload({ onResponse }) {
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append('gmlFile', file);
       event.target.value = '';
 
       const response = await sendAsync(API_URL, formData, { headers: { 'Content-Type': 'multipart/form-data' } });
