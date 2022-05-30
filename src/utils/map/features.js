@@ -4,6 +4,9 @@ import GeometryType from 'ol/geom/GeometryType';
 import { getAreaFormatted, getFeaturesByName, getLayer, getLengthFormatted, groupBy } from './helpers';
 import WKT from 'ol/format/WKT';
 
+const HIGHLIGHT_COLOR = 'rgb(0 109 173 / 50%)';
+const ERROR_COLOR = 'rgb(255 0 0 / 50%)';
+
 export function toggleFeatures(legend, map) {
    const vectorLayer = getLayer(map, 'features');
    const features = getFeaturesByName(vectorLayer, legend.name);
@@ -14,17 +17,17 @@ export function toggleFeatures(legend, map) {
 }
 
 export function toggleFeature(feature) {
-   const visible = !feature.get('visible');
+   const visible = !feature.get('_visible');
 
    if (visible) {
-      const savedStyle = feature.get('savedStyle');
+      const savedStyle = feature.get('_savedStyle');
       feature.setStyle(savedStyle);
    } else {
-      feature.set('savedStyle', feature.getStyle());
+      feature.set('_savedStyle', feature.getStyle());
       feature.setStyle(new Style(null));
    }
 
-   feature.set('visible', visible);
+   feature.set('_visible', visible);
 }
 
 export function addGeometryInfo(features) {
@@ -59,20 +62,20 @@ export function highlightSelectedFeatures(map, features) {
 
    const selectedFeatures = features.map(feature => {
       const cloned = feature.clone();
-      const errorMessages = feature.get('errorMessages');
+      const errorMessages = feature.get('_errorMessages');
 
       if (errorMessages) {
-         const wktPoints = errorMessages
+         const wkts = errorMessages
             .filter(message => message.zoomTo)
             .map(message => message.zoomTo);
 
-         if (wktPoints.length) {
+         if (wkts.length) {
             const format = new WKT();
-            const geometries = wktPoints.map(wkt => format.readGeometry(wkt));
+            const geometries = wkts.map(wkt => format.readGeometry(wkt));
             const geoCollection = new GeometryCollection();
 
             geoCollection.setGeometries(geometries);
-            cloned.set('zoomTo', geoCollection);
+            cloned.set('_zoomTo', geoCollection);
          }
       }
 
@@ -86,7 +89,7 @@ export function highlightSelectedFeatures(map, features) {
 }
 
 export function addLegendToFeatures(features, legend) {
-   const groupedFeatures = groupBy(features, feature => feature.get('name'));
+   const groupedFeatures = groupBy(features, feature => feature.get('_name'));
    const featureNames = Object.keys(groupedFeatures);
 
    for (let i = 0; i < featureNames.length; i++) {
@@ -101,7 +104,7 @@ export function addLegendToFeatures(features, legend) {
 
       for (let j = 0; j < feats.length; j++) {
          const feature = feats[j];
-         feature.set('symbolId', symbol.id);
+         feature.set('_symbolId', symbol.id);
       }
    }
 }
@@ -127,10 +130,10 @@ export function addValidationResultToFeatures(mapDocument, features) {
          const feature = features.find(feat => feat.get('id') === gmlId);
 
          if (feature) {
-            const errorMessages = feature.get('errorMessages');
+            const errorMessages = feature.get('_errorMessages');
 
             if (!errorMessages) {
-               feature.set('errorMessages', [{ message: message.message, zoomTo: message.zoomTo }]);
+               feature.set('_errorMessages', [{ message: message.message, zoomTo: message.zoomTo }]);
             } else {
                errorMessages.push({ message: message.message, zoomTo: message.zoomTo });
             }
@@ -141,17 +144,17 @@ export function addValidationResultToFeatures(mapDocument, features) {
 
 function getHighlightStyle(feature) {
    const stroke = new Stroke({
-      color: feature.get('errorMessages')?.length ? 'rgb(255 0 0 / 50%)' : 'rgb(0 109 173 / 50%)',
+      color: feature.get('_errorMessages')?.length ? ERROR_COLOR : HIGHLIGHT_COLOR,
       lineCap: 'butt',
-      width: 5,
+      width: 3
    });
 
-   let style;
+   let highlightStyle;
 
-   if (feature.getGeometry().getType() === 'Point') {
+   if (feature.getGeometry().getType() === GeometryType.POINT) {
       const image = feature.getStyle()[0].getImage();
-      
-      style = new Style({
+
+      highlightStyle = new Style({
          image: new Circle({
             radius: image.getRadius(),
             fill: image.getFill(),
@@ -159,23 +162,60 @@ function getHighlightStyle(feature) {
          })
       });
    } else {
-      style = new Style({ 
-         stroke 
+      highlightStyle = new Style({
+         stroke
       });
    }
 
-   return [
-      style,
-      new Style({
-         geometry: 'zoomTo',
-         image: new Circle({
-            radius: 8,
-            fill: new Fill({ color: 'rgb(255 0 0 / 50%)' }),
-            stroke: new Stroke({
-               color: 'black',
-               width: 2
-            })
-         })
-      })
-   ];
+   const zoomToStyles = [];
+   const zoomTo = feature.get('_zoomTo');
+
+   if (zoomTo) {
+      const geometries = zoomTo.getGeometries();
+      addZoomToStyle(geometries, zoomToStyles);
+   }
+
+   return [highlightStyle].concat(zoomToStyles);
+}
+
+function addZoomToStyle(geometries, styles) {
+   for (let i = 0; i < geometries.length; i++) {
+      const geometry = geometries[i];
+      const geometryType = geometry.getType();
+
+      switch (geometryType) {
+         case GeometryType.GEOMETRY_COLLECTION:
+            addZoomToStyle(geometry.getGeometries(), styles);
+            break;
+         case GeometryType.POLYGON:
+         case GeometryType.MULTI_POLYGON:
+         case GeometryType.LINE_STRING:
+         case GeometryType.MULTI_LINE_STRING:
+            styles.push(
+               new Style({
+                  geometry,
+                  stroke: new Stroke({
+                     color: ERROR_COLOR,
+                     lineCap: 'round',
+                     width: 10,
+                  })
+               })
+            );
+            break;
+         case GeometryType.POINT:
+         case GeometryType.MULTI_POINT:
+            styles.push(
+               new Style({
+                  geometry,
+                  image: new Circle({
+                     radius: 5,
+                     fill: new Fill({ color: ERROR_COLOR })
+                  })
+               })
+            );
+            break;             
+         default:
+            break;
+      }
+   }
 }

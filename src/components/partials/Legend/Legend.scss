@@ -32,5 +32,10 @@
          height: 25px;
          margin: 0 5px;
       }
+      
+      .symbol-name {
+         user-select: none;
+         cursor: ns-resize;
+      }
    }
 }

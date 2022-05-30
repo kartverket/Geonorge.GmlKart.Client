@@ -17,7 +17,7 @@ function Symbol({ symbol }) {
 
          <img src={symbol.image} alt="" />
 
-         {symbol.name} ({symbol.featureCount})
+         <span className="symbol-name">{symbol.name} ({symbol.featureCount})</span>
       </div>
    )
 }

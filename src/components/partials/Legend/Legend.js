@@ -1,7 +1,8 @@
+import { ReactSortable } from 'react-sortablejs';
 import Symbol from './Symbol/Symbol';
 import './Legend.scss';
 
-function Legend({ legend }) {
+function Legend({ legend, onListSorted }) {
    if (!legend.length) {
       return null;
    }
@@ -12,7 +13,11 @@ function Legend({ legend }) {
 
          <div className="box-content">
             <div className="symbols">
-               {legend.map((symbol, index) => <Symbol symbol={symbol} key={'symbol-' + index} />)}
+               <ReactSortable list={legend} setList={onListSorted}>
+                  {
+                     legend.map(symbol => <Symbol symbol={symbol} key={'symbol-' + symbol.id} />)
+                  }
+               </ReactSortable>
             </div>
          </div>
       </div>

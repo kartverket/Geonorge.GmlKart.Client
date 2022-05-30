@@ -4,7 +4,6 @@ import { getScaleForResolution } from 'utils/map/scale';
 import { ScaleBar } from 'components/partials';
 import NorthArrow from 'assets/gfx/symbol-north-arrow.svg';
 import './MapInfo.scss';
-import dayjs from 'dayjs';
 
 function MapInfo({ mapDocument, map }) {
    const prevResolution = useRef(0);
@@ -61,11 +60,6 @@ function MapInfo({ mapDocument, map }) {
                <div className="box-row">
                   <div className="label">Kilde for basiskart:</div>
                   <div className="value">{baseMap.name}</div>
-               </div>
-
-               <div className="box-row">
-                  <div className="label">Dato for basiskart:</div>
-                  <div className="value">{dayjs(baseMap.updated).format('DD.MM.YYYY')}</div>
                </div>
 
                <div className="box-row">

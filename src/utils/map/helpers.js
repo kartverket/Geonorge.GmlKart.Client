@@ -2,6 +2,7 @@ import { extend, getCenter } from 'ol/extent';
 import detect from 'detect-file-type';
 import filesize from 'filesize';
 import { getArea, getLength } from 'ol/sphere';
+import WKT from 'ol/format/WKT';
 
 const MAX_ZOOM = process.env.REACT_APP_MAX_ZOOM;
 const VALID_MIME = process.env.REACT_APP_VALID_MIME;
@@ -18,7 +19,7 @@ export function getFeatureById(vectorLayer, id) {
 
 export function getFeaturesByName(vectorLayer, name) {
    return vectorLayer.getSource().getFeatures()
-      .filter(feature => feature.get('name') === name);
+      .filter(feature => feature.get('_name') === name);
 }
 
 export function getSymbolById(legend, id) {
@@ -35,11 +36,9 @@ export function zoomTo(map, features) {
    zoom(map, featureExtent);
 }
 
-export function zoomToPoint(map, feature) {
-   const layer = getLayer(map, 'selected-features');
-   const selectedFeature = getFeatureById(layer, feature.get('id'));
-   const zoomTo = selectedFeature.get('zoomTo');
-   const extent = zoomTo.getExtent();
+export function zoomToGeometry(map, wkt) {
+   const geometry = new WKT().readGeometry(wkt);
+   const extent = geometry.getExtent()
 
    zoom(map, extent);
 }

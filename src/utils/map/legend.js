@@ -10,6 +10,7 @@ import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
 import { createId, groupBy } from './helpers';
 import colorsys from 'colorsys';
+import orderBy from 'lodash.orderby';
 
 const LEGEND_SIZE = 50;
 const START_COLOR = '#86bff2';
@@ -18,7 +19,7 @@ export async function createLegend(featuresLayer) {
    const [tempMap, tempMapElement] = createLegendTempMap();
    const vectorLayer = tempMap.getLayers().getArray()[0];
    const features = featuresLayer.getSource().getFeatures();
-   const groupedFeatures = groupBy(features, feature => feature.get('name'));
+   const groupedFeatures = groupBy(features, feature => feature.get('_name'));
    const featureNames = Object.keys(groupedFeatures);
    const colors = generateColors(featureNames.length);
    const legend = [];
@@ -35,18 +36,21 @@ export async function createLegend(featuresLayer) {
    tempMap.dispose();
    tempMapElement.remove();
 
-   return legend;
+   const ordered = orderLegend(legend);
+
+   return ordered;
 }
 
 async function createSymbol(name, feature, featureCount, color, vectorLayer) {
    const geometryType = feature.getGeometry().getType();
-   const tempFeature = new Feature({ geometry: createGeometry(geometryType) });
+   const tempFeature = new Feature({ geometry: createGeometry(geometryType) });   
    const style = createStyle(geometryType, color);
    tempFeature.setStyle(style);
 
    const symbol = {
       id: createId(),
       name,
+      geometryType,
       featureCount,
       image: await createSymbolImage(vectorLayer, tempFeature),
       style,
@@ -101,17 +105,16 @@ function createStyle(geometryType, color) {
          return [
             new Style({
                image: new CircleStyle({
-                 radius: 4,
-                 fill: new Fill({
-                   color
-                 }),
-                 stroke: new Stroke({
-                   color,
-                   width: 1
-                 })
-               }),
-               zIndex: Infinity
-             })
+                  radius: 4,
+                  fill: new Fill({
+                     color
+                  }),
+                  stroke: new Stroke({
+                     color,
+                     width: 1
+                  })
+               })
+            })
          ];
       default:
          return [
@@ -142,12 +145,35 @@ function createLegendTempMap() {
    return [map, mapElement];
 }
 
+function orderLegend(legend) {
+   const grouped = groupBy(legend, symbol => symbol.geometryType);
+   
+   const points = (grouped[GeometryType.POINT] || [])
+      .concat(grouped[GeometryType.MULTI_POINT] || []);
+   
+   const lines = (grouped[GeometryType.LINE_STRING] || [])
+      .concat(grouped[GeometryType.MULTI_LINE_STRING] || []); 
+
+   const surfaces = (grouped[GeometryType.POLYGON] || [])
+      .concat(grouped[GeometryType.MULTI_POLYGON] || []);
+
+   const ordered = orderBy(points, symbol => symbol.name)
+      .concat(orderBy(lines, symbol => symbol.name))
+      .concat(orderBy(surfaces, symbol => symbol.name));
+
+   for (let i = 0; i < ordered.length; i++) {
+      ordered[i].style[0].setZIndex(ordered.length - i);
+   }
+
+   return ordered;
+}
+
 function generateColors(num) {
    const colors = colorGenerator.generate(START_COLOR, num).purer(0.1).get();
 
    return colors.map(color => {
-      const {r, g, b} = colorsys.hexToRgb(color);
+      const { r, g, b } = colorsys.hexToRgb(color);
 
-      return `rgba(${r}, ${g}, ${b}, 0.75)`;
+      return `rgba(${r}, ${g}, ${b})`;
    });
 }

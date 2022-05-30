@@ -92,6 +92,13 @@
             max-height: 200px;
             overflow-y: auto;
          }
+         
+         .label, 
+         .value {
+            overflow-x: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+         }
       }
    }
 }
