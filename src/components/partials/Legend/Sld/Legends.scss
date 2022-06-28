@@ -1,0 +1,106 @@
+.sld-legend {
+   border-bottom: 0 !important;
+   flex-grow: 1;
+
+   .box-content {
+      padding: 15px 10px 0px 10px !important;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      height: 1px;      
+      min-height: 0;
+   }
+
+   &.sld-legend-show-all {
+      .legend-hidden,      
+      .symbol-hidden {         
+         display: block !important;
+      }
+   }
+
+   .show-all {
+      margin-bottom: 15px;
+   }
+
+   .legend-list {
+      min-height: 0;
+      overflow-y: auto;      
+      border: 1px dashed #d5d5d5;
+      padding: 10px;      
+   }
+
+   .legend {
+      margin-bottom: 20px;
+
+      .expand-button {
+         color: #333333 !important;
+      }
+
+      &.legend-hidden {
+         display: none;
+      }
+
+      &.legend-expanded {
+         .expand-button {
+            &::after {
+               transform: rotate(90deg);
+            }
+         }
+
+         .symbols {
+            display: block;
+            margin-left: 5px;
+         }
+      }
+
+      .header {
+         display: flex;
+         align-items: center;
+         margin-bottom: 10px;
+
+         h3 {
+            cursor: pointer;
+            user-select: none;
+            display: inline-block;
+            margin-bottom: 0;
+
+            &::after {
+               content: "";
+               background: url('../../../../assets/gfx/icon-arrow.svg') no-repeat center;
+               width: 10px;
+               height: 12px;
+               display: inline-block;
+               background-size: 11px;
+               margin-left: 10px;
+               transform: rotate(90deg);
+               transition: all 0.25s ease;
+               margin: 0;
+               margin: 0;
+               margin-left: 8px;
+               vertical-align: -1px;
+            }
+         }
+      }
+
+      .symbols {         
+         display: none;
+
+         .symbol {
+            font-size: 13px;
+            margin-bottom: 5px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+
+            &.symbol-hidden {
+               display: none;
+            }
+
+            img {
+               width: 32px;
+               margin-right: 5px;
+            }
+         }
+      }
+   }
+}

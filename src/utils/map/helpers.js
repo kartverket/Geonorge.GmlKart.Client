@@ -3,9 +3,12 @@ import detect from 'detect-file-type';
 import filesize from 'filesize';
 import { getArea, getLength } from 'ol/sphere';
 import WKT from 'ol/format/WKT';
+import Url from 'url-parse';
 
 const MAX_ZOOM = process.env.REACT_APP_MAX_ZOOM;
 const VALID_MIME = process.env.REACT_APP_VALID_MIME;
+const PROXY_HOSTS = process.env.REACT_APP_PROXY_HOSTS.split(',');
+const PROXY_URL = process.env.REACT_APP_PROXY_URL;
 
 export function getLayer(map, id) {
    return map.getLayers().getArray()
@@ -135,8 +138,21 @@ export function getLengthFormatted(line) {
    return `${Math.round(length * 100) / 100} m`.replace('.', ',');
 }
 
-export const getFileSize = size => filesize(size, { separator: ',', spacer: ' ' });
+export function generateProxyUrl(urlString) {
+   const url = new Url(urlString);
+
+   if (PROXY_HOSTS.includes(url.host)) {
+      const proxyUrl = new Url(PROXY_URL);
+      proxyUrl.set('query', `url=${urlString}`);
+
+      return proxyUrl.toString();
+   }
+   
+   return urlString;
+}
+
+export const getFileSize = size => filesize(size, { separator: ',', spacer: ' ', standard: 'jedec' });
 
 export const allEqual = array => array.every(value => value === array[0]);
 
-export const createId = () => '_' + Math.random().toString(36).substring(2, 11);
+export const createRandomId = () => '_' + Math.random().toString(36).substring(2, 11);

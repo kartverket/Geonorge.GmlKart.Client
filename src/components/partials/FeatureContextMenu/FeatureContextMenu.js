@@ -2,7 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { getSymbolById } from 'utils/map/helpers';
 import './FeatureContextMenu.scss';
 
-function FeatureContextMenu({ map, data, legend, onFeatureSelect }) {
+function FeatureContextMenu({ map, data, symbols, onFeatureSelect }) {
    const [visible, setVisible] = useState(false);
    const [posistion, setPosition] = useState({ top: 0, left: 0 });
    const menuElement = useRef(null);
@@ -70,7 +70,7 @@ function FeatureContextMenu({ map, data, legend, onFeatureSelect }) {
    function getSymbol(feature) {
       return (
          feature.get('_symbolId') ?
-            <img src={getSymbolById(legend, feature.get('_symbolId'))?.image} alt="" /> :
+            <img src={getSymbolById(symbols, feature.get('_symbolId'))?.image} alt="" /> :
             <span className="no-legend" />
       );
    }

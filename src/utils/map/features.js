@@ -3,6 +3,7 @@ import { Stroke, Style, Fill, Circle } from 'ol/style';
 import GeometryType from 'ol/geom/GeometryType';
 import { getAreaFormatted, getFeaturesByName, getLayer, getLengthFormatted, groupBy } from './helpers';
 import WKT from 'ol/format/WKT';
+import { filterSelector } from 'utils/sld-reader/Filter';
 
 const HIGHLIGHT_COLOR = 'rgb(0 109 173 / 50%)';
 const ERROR_COLOR = 'rgb(255 0 0 / 50%)';
@@ -88,7 +89,7 @@ export function highlightSelectedFeatures(map, features) {
    layerSource.addFeatures(selectedFeatures);
 }
 
-export function addLegendToFeatures(features, legend) {
+export function addGenericLegendToFeatures(features, legend) {
    const groupedFeatures = groupBy(features, feature => feature.get('_name'));
    const featureNames = Object.keys(groupedFeatures);
 
@@ -105,6 +106,31 @@ export function addLegendToFeatures(features, legend) {
       for (let j = 0; j < feats.length; j++) {
          const feature = feats[j];
          feature.set('_symbolId', symbol.id);
+      }
+   }
+}
+
+export function addSldLegendToFeatures(features, legends) {
+   const groupedFeatures = groupBy(features, feature => feature.get('_name'));
+   const featureNames = Object.keys(groupedFeatures);
+
+   for (let i = 0; i < featureNames.length; i++) {
+      const featureName = featureNames[i];
+      const symbols = legends.find(legend => legend.name === featureName)?.symbols || [];
+
+      if (!symbols.length) {
+         continue;
+      }
+
+      const feats = groupedFeatures[featureName];
+
+      for (let j = 0; j < feats.length; j++) {
+         const feature = feats[j];
+         const symbol = symbols.find(sym => !sym.rule.filter || filterSelector(sym.rule.filter, feature));
+
+         if (symbol) {
+            feature.set('_symbolId', symbol.id);
+         }
       }
    }
 }
@@ -143,39 +169,51 @@ export function addValidationResultToFeatures(mapDocument, features) {
 }
 
 function getHighlightStyle(feature) {
+   if (feature.get('_name') === 'RpJuridiskPunkt') {
+      return [];
+   }
+
    const stroke = new Stroke({
       color: feature.get('_errorMessages')?.length ? ERROR_COLOR : HIGHLIGHT_COLOR,
       lineCap: 'butt',
       width: 3
    });
 
+   const origStyleFunction = feature.getStyleFunction();
    let highlightStyle;
 
-   if (feature.getGeometry().getType() === GeometryType.POINT) {
-      const image = feature.getStyle()[0].getImage();
+   return (feature, resolution) => {
+      if (feature.get('_name') === 'RpPåskrift') {
+         const styles = origStyleFunction(feature, resolution);
 
-      highlightStyle = new Style({
-         image: new Circle({
-            radius: image.getRadius(),
-            fill: image.getFill(),
+         highlightStyle = styles[0].clone();
+         highlightStyle.getText().setStroke(stroke);
+      } else if (feature.getGeometry().getType() === GeometryType.POINT) {
+         const image = feature.getStyle()[0].getImage();
+
+         highlightStyle = new Style({
+            image: new Circle({
+               radius: image.getRadius(),
+               fill: image.getFill(),
+               stroke
+            })
+         });
+      } else {
+         highlightStyle = new Style({
             stroke
-         })
-      });
-   } else {
-      highlightStyle = new Style({
-         stroke
-      });
-   }
+         });
+      }
 
-   const zoomToStyles = [];
-   const zoomTo = feature.get('_zoomTo');
+      const zoomToStyles = [];
+      const zoomTo = feature.get('_zoomTo');
 
-   if (zoomTo) {
-      const geometries = zoomTo.getGeometries();
-      addZoomToStyle(geometries, zoomToStyles);
-   }
+      if (zoomTo) {
+         const geometries = zoomTo.getGeometries();
+         addZoomToStyle(geometries, zoomToStyles);
+      }
 
-   return [highlightStyle].concat(zoomToStyles);
+      return [highlightStyle].concat(zoomToStyles);
+   };
 }
 
 function addZoomToStyle(geometries, styles) {
@@ -213,7 +251,7 @@ function addZoomToStyle(geometries, styles) {
                   })
                })
             );
-            break;             
+            break;
          default:
             break;
       }

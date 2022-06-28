@@ -1,11 +1,11 @@
 import { useDispatch } from 'react-redux';
-import { toggleSymbol } from 'store/slices/mapSlice';
+import { toggleLegend } from 'store/slices/mapSlice';
 
 function Symbol({ symbol }) {
    const dispatch = useDispatch();
 
    function handleCheckboxChange(event) {
-      dispatch(toggleSymbol({ name: symbol.name, visible: event.target.checked }));
+      dispatch(toggleLegend({ name: symbol.name, visible: event.target.checked }));
    }
 
    return (
