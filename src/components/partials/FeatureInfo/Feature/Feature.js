@@ -2,7 +2,7 @@ import { Fragment } from 'react';
 import { getPropertyList } from 'utils/map/feature-info';
 import { getSymbolById, zoomTo, zoomToGeometry } from 'utils/map/helpers';
 
-function Feature({ feature, map, legend }) {
+function Feature({ feature, map, symbols }) {
    function getFeatureInfo(feature) {
       const propertyList = getPropertyList(feature);
 
@@ -57,7 +57,7 @@ function Feature({ feature, map, legend }) {
 
 
    function getSymbolImage(id) {
-      return getSymbolById(legend, id)?.image;
+      return getSymbolById(symbols, id)?.image;
    }
 
    function getErrorMessages(feature) {

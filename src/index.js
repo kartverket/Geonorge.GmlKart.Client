@@ -6,6 +6,7 @@ import App from './App';
 import store from 'store';
 import modals from 'components/modals/modals';
 import 'config/projections.config';
+import 'config/extents.config';
 import './index.scss';
 
 ReactDOM.render(

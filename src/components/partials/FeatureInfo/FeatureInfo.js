@@ -5,7 +5,7 @@ import { toggleFeatureInfo } from 'store/slices/mapSlice';
 import Feature from './Feature/Feature';
 import './FeatureInfo.scss';
 
-function FeatureInfo({ map, features, legend }) {
+function FeatureInfo({ map, features, symbols }) {
    const [expanded, setExpanded] = useState(false);
    const [activeKey, setActiveKey] = useState(0);
    const featureInfo = useSelector(state => state.map.featureInfo);
@@ -38,13 +38,13 @@ function FeatureInfo({ map, features, legend }) {
          <div className="box-content">
             {
                features.length === 1 ?
-                  <Feature feature={features[0]} map={map} legend={legend} /> :
+                  <Feature feature={features[0]} map={map} symbols={symbols} /> :
                   <Tabs transition={false} activeKey={activeKey} onSelect={handleTabSelect}>
                      {
                         features.map((feature, index) => {
                            return (
                               <Tab eventKey={index} key={feature.get('id')} title={index + 1}>
-                                 <Feature feature={feature} map={map} legend={legend} />
+                                 <Feature feature={feature} map={map} symbols={symbols} />
                               </Tab>
                            );
                         })
