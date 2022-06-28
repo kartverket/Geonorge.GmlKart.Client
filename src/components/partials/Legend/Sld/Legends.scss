@@ -43,7 +43,7 @@
       &.legend-expanded {
          .expand-button {
             &::after {
-               transform: rotate(90deg);
+               transform: rotate(-90deg) !important;
             }
          }
 
@@ -58,7 +58,7 @@
          align-items: center;
          margin-bottom: 10px;
 
-         h3 {
+         .expand-button {
             cursor: pointer;
             user-select: none;
             display: inline-block;
