@@ -6,7 +6,6 @@
    }
 
    .rule-name {
-      font-style: italic;
       cursor: pointer;
       display: flex;
       align-items: center;
@@ -31,14 +30,14 @@
          height: 11px;
          background-size: 11px;
          margin-left: 10px;
-         transform: rotate(90deg);
+         transform: rotate(-90deg);
          transition: all 0.25s ease;
       }
    }
    
    &.rule-collapsed {
       .rule-name::after {
-         transform: rotate(0deg);
+         transform: rotate(90deg);
       }
    
       .messages {

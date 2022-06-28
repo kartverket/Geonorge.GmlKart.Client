@@ -8,15 +8,13 @@ function Legend({ legend, onListSorted }) {
    }
 
    return (
-      <div className="legend box">
+      <div className="generic-legend box">
          <div className="box-header">Tegnforklaringer</div>
 
          <div className="box-content">
             <div className="symbols">
                <ReactSortable list={legend} setList={onListSorted}>
-                  {
-                     legend.map(symbol => <Symbol symbol={symbol} key={'symbol-' + symbol.id} />)
-                  }
+                  {legend.map(symbol => <Symbol symbol={symbol} key={'symbol-' + symbol.id} />)}
                </ReactSortable>
             </div>
          </div>

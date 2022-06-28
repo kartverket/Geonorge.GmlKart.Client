@@ -8,14 +8,14 @@ import CircleStyle from 'ol/style/Circle';
 import Fill from 'ol/style/Fill';
 import Stroke from 'ol/style/Stroke';
 import Style from 'ol/style/Style';
-import { createId, groupBy } from './helpers';
+import { createRandomId, groupBy } from './helpers';
 import colorsys from 'colorsys';
 import orderBy from 'lodash.orderby';
 
 const LEGEND_SIZE = 50;
 const START_COLOR = '#86bff2';
 
-export async function createLegend(featuresLayer) {
+export async function createGenericLegend(featuresLayer) {
    const [tempMap, tempMapElement] = createLegendTempMap();
    const vectorLayer = tempMap.getLayers().getArray()[0];
    const features = featuresLayer.getSource().getFeatures();
@@ -41,6 +41,28 @@ export async function createLegend(featuresLayer) {
    return ordered;
 }
 
+export function createLegendTempMap() {
+   const map = new Map({
+      layers: [
+         new VectorLayer({
+            source: new VectorSource()
+         })
+      ],
+      view: new View({
+         extent: [0, 0, LEGEND_SIZE, LEGEND_SIZE]
+      })
+   });
+
+   const mapElement = document.createElement('div');
+   Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${LEGEND_SIZE}px`, height: `${LEGEND_SIZE}px` });
+   document.getElementsByTagName('body')[0].appendChild(mapElement);
+
+   map.setTarget(mapElement);
+   map.getView().fit([0, 0, LEGEND_SIZE, LEGEND_SIZE], map.getSize());
+
+   return [map, mapElement];
+}
+
 async function createSymbol(name, feature, featureCount, color, vectorLayer) {
    const geometryType = feature.getGeometry().getType();
    const tempFeature = new Feature({ geometry: createGeometry(geometryType) });   
@@ -48,7 +70,7 @@ async function createSymbol(name, feature, featureCount, color, vectorLayer) {
    tempFeature.setStyle(style);
 
    const symbol = {
-      id: createId(),
+      id: createRandomId(),
       name,
       geometryType,
       featureCount,
@@ -121,28 +143,6 @@ function createStyle(geometryType, color) {
             new Style({ fill: new Fill({ color }) })
          ];
    }
-}
-
-function createLegendTempMap() {
-   const map = new Map({
-      layers: [
-         new VectorLayer({
-            source: new VectorSource()
-         })
-      ],
-      view: new View({
-         extent: [0, 0, LEGEND_SIZE, LEGEND_SIZE]
-      })
-   });
-
-   const mapElement = document.createElement('div');
-   Object.assign(mapElement.style, { position: 'absolute', top: '-9999px', left: '-9999px', width: `${LEGEND_SIZE}px`, height: `${LEGEND_SIZE}px` });
-   document.getElementsByTagName('body')[0].appendChild(mapElement);
-
-   map.setTarget(mapElement);
-   map.getView().fit([0, 0, LEGEND_SIZE, LEGEND_SIZE], map.getSize());
-
-   return [map, mapElement];
 }
 
 function orderLegend(legend) {

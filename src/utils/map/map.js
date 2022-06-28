@@ -12,10 +12,12 @@ import WMTSCapabilities from 'ol/format/WMTSCapabilities';
 import VectorSource from 'ol/source/Vector';
 import { addValidationResultToFeatures } from './features';
 import axios from 'axios';
+import { addSldStyling } from './styling';
+import { getAdjustedEpsgCode } from 'config/epsg.config';
 
 let wmtsOptions = null;
 
-function createFeaturesLayer(mapDocument) {
+async function createFeaturesLayer(mapDocument) {
    const features = new GeoJSON().readFeatures(mapDocument.geoJson);
 
    const featuresLayer = new VectorLayer({
@@ -26,6 +28,10 @@ function createFeaturesLayer(mapDocument) {
    featuresLayer.set('id', 'features');
 
    addValidationResultToFeatures(mapDocument, features);
+
+   if (mapDocument.styling) {
+      await addSldStyling(features, mapDocument.styling, () => { featuresLayer.changed() });
+   }
 
    return featuresLayer;
 }
@@ -97,23 +103,31 @@ async function createTileLayerWMTS(epsgCode) {
    });
 }
 
-
 export async function createMap(mapDocument) {
    if (!mapDocument) {
       return null;
    }
 
-   return new Map({
-      layers: [
-         await createTileLayer(mapDocument.epsg.code),
-         createFeaturesLayer(mapDocument),
-         createSelectedFeaturesLayer()
-      ],
-      view: new View({
-         projection: mapDocument.epsg.code,
-         padding: [25, 25, 25, 25]
-      }),
+   const map = new Map({
       controls: defaultControls().extend([new FullScreen()]),
       interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
    });
+
+   let epsgCode = getAdjustedEpsgCode(mapDocument.epsg.code);
+   
+   if (epsgCode !== null) {
+      map.addLayer(await createTileLayer(epsgCode));
+   } else {
+      epsgCode = mapDocument.epsg.code;
+   }
+
+   map.addLayer(await createFeaturesLayer(mapDocument));
+   map.addLayer(createSelectedFeaturesLayer());
+
+   map.setView(new View({
+      padding: [25, 25, 25, 25],
+      projection: epsgCode
+   }));
+
+   return map;
 }
