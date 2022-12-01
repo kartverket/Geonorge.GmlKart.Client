@@ -1,5 +1,5 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { Provider } from 'react-redux';
 import { ModalsProvider } from 'context/ModalsContext';
 import App from './App';
@@ -9,14 +9,17 @@ import 'config/projections.config';
 import 'config/extents.config';
 import './index.scss';
 
-ReactDOM.render(
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+root.render(
    <React.StrictMode>
       <Provider store={store}>
          <ModalsProvider initialModals={modals}>
             <App />
          </ModalsProvider>
       </Provider>
-   </React.StrictMode>,
-   document.getElementById('root')
+   </React.StrictMode>
 );
+
 

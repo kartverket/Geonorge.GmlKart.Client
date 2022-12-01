@@ -1,5 +1,5 @@
 import { getPointResolution } from 'ol/proj';
-import Units from 'ol/proj/Units';
+import { METERS_PER_UNIT } from 'ol/proj/Units';
 
 const DEFAULT_DPI = 25.4 / 0.28;
 const LEADING_DIGITS = [1, 2, 5];
@@ -29,7 +29,7 @@ export function createScaleBar(view, numberOfSteps, minWidth, maxWidth) {
       projection,
       resolution,
       center,
-      Units.METERS
+      METERS_PER_UNIT.m
    );
 
    let nominalCount = minWidth * pointResolution;

@@ -1,14 +1,13 @@
 import { extend, getCenter } from 'ol/extent';
-import detect from 'detect-file-type';
-import filesize from 'filesize';
+import { filesize } from 'filesize';
 import { getArea, getLength } from 'ol/sphere';
 import WKT from 'ol/format/WKT';
 import Url from 'url-parse';
 
 const MAX_ZOOM = process.env.REACT_APP_MAX_ZOOM;
-const VALID_MIME = process.env.REACT_APP_VALID_MIME;
 const PROXY_HOSTS = process.env.REACT_APP_PROXY_HOSTS.split(',');
 const PROXY_URL = process.env.REACT_APP_PROXY_URL;
+const GML_REGEX = /<\?xml.*?<\w+:FeatureCollection.*?xmlns:\w+="http:\/\/www\.opengis\.net\/gml\/3\.2"/s;
 
 export function getLayer(map, id) {
    return map.getLayers().getArray()
@@ -104,18 +103,9 @@ export function debounce(func, wait, immediate) {
 };
 
 export async function isValidFileType(file) {
-   return new Promise((resolve) => {
-      file.slice(0, 50).arrayBuffer()
-         .then(buffer => {
-            detect.fromBuffer(buffer, (error, result) => {
-               if (error !== null || result.mime !== VALID_MIME) {
-                  resolve(false);
-               }
+   const fileContents = await file.slice(0, 100000).text();
 
-               resolve(true);
-            });
-         });
-   })
+   return GML_REGEX.test(fileContents);
 }
 
 export function getAreaFormatted(polygon) {

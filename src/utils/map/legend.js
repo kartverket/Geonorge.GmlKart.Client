@@ -1,7 +1,7 @@
 import colorGenerator from 'colors-generator';
 import { Feature, Map, View } from 'ol';
 import { LineString, Point, Polygon } from 'ol/geom';
-import GeometryType from 'ol/geom/GeometryType';
+import { GeometryType } from './constants';
 import VectorLayer from 'ol/layer/Vector';
 import VectorSource from 'ol/source/Vector';
 import CircleStyle from 'ol/style/Circle';
@@ -96,14 +96,14 @@ async function createSymbolImage(vectorLayer, feature) {
 
 function createGeometry(geometryType) {
    switch (geometryType) {
-      case GeometryType.POLYGON:
-      case GeometryType.MULTI_POLYGON:
+      case GeometryType.Polygon:
+      case GeometryType.MultiPolygon:
          return new Polygon([[[0, 0], [0, LEGEND_SIZE], [LEGEND_SIZE, LEGEND_SIZE], [LEGEND_SIZE, 0], [0, 0]]]);
-      case GeometryType.LINE_STRING:
-      case GeometryType.MULTI_LINE_STRING:
+      case GeometryType.LineString:
+      case GeometryType.MultiLineString:
          return new LineString([[0, LEGEND_SIZE], [LEGEND_SIZE, 0]]);
-      case GeometryType.POINT:
-      case GeometryType.MULTI_POINT:
+      case GeometryType.Point:
+      case GeometryType.MultiPoint:
          return new Point([LEGEND_SIZE / 2, LEGEND_SIZE / 2]);
       default:
          return new Polygon([[[0, 0], [0, LEGEND_SIZE], [LEGEND_SIZE, LEGEND_SIZE], [LEGEND_SIZE, 0], [0, 0]]]);
@@ -112,18 +112,18 @@ function createGeometry(geometryType) {
 
 function createStyle(geometryType, color) {
    switch (geometryType) {
-      case GeometryType.POLYGON:
-      case GeometryType.MULTI_POLYGON:
+      case GeometryType.Polygon:
+      case GeometryType.MultiPolygon:
          return [
             new Style({ fill: new Fill({ color }) })
          ];
-      case GeometryType.LINE_STRING:
-      case GeometryType.MULTI_LINE_STRING:
+      case GeometryType.LineString:
+      case GeometryType.MultiLineString:
          return [
             new Style({ stroke: new Stroke({ color, width: 2 }) })
          ];
-      case GeometryType.POINT:
-      case GeometryType.MULTI_POINT:
+      case GeometryType.Point:
+      case GeometryType.MultiPoint:
          return [
             new Style({
                image: new CircleStyle({
@@ -148,14 +148,14 @@ function createStyle(geometryType, color) {
 function orderLegend(legend) {
    const grouped = groupBy(legend, symbol => symbol.geometryType);
    
-   const points = (grouped[GeometryType.POINT] || [])
-      .concat(grouped[GeometryType.MULTI_POINT] || []);
+   const points = (grouped[GeometryType.Point] || [])
+      .concat(grouped[GeometryType.MultiPoint] || []);
    
-   const lines = (grouped[GeometryType.LINE_STRING] || [])
-      .concat(grouped[GeometryType.MULTI_LINE_STRING] || []); 
+   const lines = (grouped[GeometryType.LineString] || [])
+      .concat(grouped[GeometryType.MultiLineString] || []); 
 
-   const surfaces = (grouped[GeometryType.POLYGON] || [])
-      .concat(grouped[GeometryType.MULTI_POLYGON] || []);
+   const surfaces = (grouped[GeometryType.Polygon] || [])
+      .concat(grouped[GeometryType.MultiPolygon] || []);
 
    const ordered = orderBy(points, symbol => symbol.name)
       .concat(orderBy(lines, symbol => symbol.name))

@@ -84,6 +84,27 @@ h3 {
    color: #6f92a7;
 }
 
+.ol-control {
+   padding: 0;
+   border-radius: 0;
+   background-color: unset;
+
+   &:hover {
+      background-color: unset;
+   }
+
+   button {
+      color: #ffffff;
+      background-color: rgba(0, 60, 136, 0.5);
+
+      &:hover {
+         background-color: rgba(0, 60, 136, 0.7);
+         color: #ffffff;
+         outline: none;
+      }
+   }
+}
+
 .ol-full-screen,
 .ol-zoom,
 .ol-zoom-extent,
