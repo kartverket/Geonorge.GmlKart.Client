@@ -4,6 +4,7 @@ import { getScaleForResolution } from 'utils/map/scale';
 import { ScaleBar } from 'components/partials';
 import NorthArrow from 'assets/gfx/symbol-north-arrow.svg';
 import './MapInfo.scss';
+import { getLayer } from 'utils/map/helpers';
 
 function MapInfo({ mapDocument, map }) {
    const prevResolution = useRef(0);
@@ -47,6 +48,14 @@ function MapInfo({ mapDocument, map }) {
       [map, getScale]
    );
 
+   function hasBaseMap() {
+      if (!map) {
+         return false;
+      }
+
+      return getLayer(map, 'baseMap') !== undefined;
+   }
+
    if (!mapDocument || !map) {
       return null;
    }
@@ -57,22 +66,28 @@ function MapInfo({ mapDocument, map }) {
 
          <div className="box-content">
             <div>
-               <div className="box-row">
-                  <div className="label">Kilde for basiskart:</div>
-                  <div className="value">{baseMap.name}</div>
-               </div>
-
+               {
+                  hasBaseMap() ?
+                     <div className="box-row">
+                        <div className="label">Kilde for basiskart:</div>
+                        <div className="value">{baseMap.name}</div>
+                     </div> :
+                     null
+               }
                <div className="box-row">
                   <div className="label">Koordinatsystem:</div>
                   <div className="value">{mapDocument.epsg.description}</div>
                </div>
             </div>
             <div>
-               <div className="box-row">
-                  <div className="label">Ekvidistanse:</div>
-                  <div className="value">{baseMap.equidistance} m</div>
-               </div>
-
+               {
+                  hasBaseMap() ?
+                     <div className="box-row">
+                        <div className="label">Ekvidistanse:</div>
+                        <div className="value">{baseMap.equidistance} m</div>
+                     </div> :
+                     null
+               }
                <div className="box-row">
                   <div className="label">Kartmålestokk:</div>
                   <div className="value">{scale}</div>
