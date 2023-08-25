@@ -121,7 +121,7 @@ export async function createMap(mapDocument) {
       interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
    });
 
-   const epsgCode = mapDocument.epsg.code2d;
+   const epsgCode = mapDocument.epsg.epsgCode2d;
    
    if (baseMapEpsgCodes.includes(epsgCode)) {
       map.addLayer(await createTileLayer(epsgCode));
