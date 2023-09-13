@@ -132,7 +132,7 @@ function createStyle(geometryType, color) {
                      color
                   }),
                   stroke: new Stroke({
-                     color,
+                     color: '#000000',
                      width: 1
                   })
                })
