@@ -23,10 +23,15 @@ function ValidationErrors({ map, validationResult, onMessageClick }) {
 
    function handleMessageClick(gmlIds) {
       const featureLayer = getLayer(map, 'features');
-      const features = gmlIds.map(gmlId => getFeatureById(featureLayer, gmlId));
 
-      onMessageClick(features);
-      zoomTo(map, features);
+      const features = gmlIds
+         .map(gmlId => getFeatureById(featureLayer, gmlId))
+         .filter(feature => feature !== undefined);
+
+      if (features.length) {
+         onMessageClick(features);
+         zoomTo(map, features);
+      }
    }
 
    function getErrorCount() {

@@ -189,15 +189,25 @@ function getHighlightStyle(feature) {
          highlightStyle = styles[0].clone();
          highlightStyle.getText().setStroke(stroke);
       } else if (feature.getGeometry().getType() === GeometryType.Point) {
-         const image = feature.getStyle()[0].getImage();
+         const image = feature.getStyle()[0]?.getImage();
 
-         highlightStyle = new Style({
-            image: new Circle({
-               radius: image.getRadius(),
-               fill: image.getFill(),
-               stroke
-            })
-         });
+         if (image) {
+            highlightStyle = new Style({
+               image: new Circle({
+                  radius: image.getRadius(),
+                  fill: image.getFill(),
+                  stroke
+               })
+            });
+         } else {
+            highlightStyle = new Style({
+               geometry: feature.getGeometry(),
+               image: new Circle({
+                  radius: 5,
+                  fill: new Fill({ color: ERROR_COLOR })
+               })
+            });
+         }
       } else {
          highlightStyle = new Style({
             stroke
