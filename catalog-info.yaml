@@ -1,0 +1,38 @@
+# nonk8s
+apiVersion: "backstage.io/v1alpha1"
+kind: "Component"
+metadata:
+  name: "Geonorge.GmlKart.Client"
+  tags:
+  - "public"
+spec:
+  type: "website"
+  lifecycle: "production"
+  owner: "datadeling_og_distribusjon"
+  system: "geonorge"
+---
+apiVersion: "backstage.io/v1alpha1"
+kind: "Group"
+metadata:
+  name: "security_champion_Geonorge.GmlKart.Client"
+  title: "Security Champion Geonorge.GmlKart.Client"
+spec:
+  type: "security_champion"
+  parent: "land_security_champions"
+  members:
+  - "dagolav"
+  children:
+  - "resource:Geonorge.GmlKart.Client"
+---
+apiVersion: "backstage.io/v1alpha1"
+kind: "Resource"
+metadata:
+  name: "Geonorge.GmlKart.Client"
+  links:
+  - url: "https://github.com/kartverket/Geonorge.GmlKart.Client"
+    title: "Geonorge.GmlKart.Client på GitHub"
+spec:
+  type: "repo"
+  owner: "security_champion_Geonorge.GmlKart.Client"
+  dependencyOf:
+  - "component:Geonorge.GmlKart.Client"
