@@ -5,7 +5,7 @@
    "private": true,
    "dependencies": {
       "@reduxjs/toolkit": "^1.9.1",
-      "axios": "^1.2.0",
+      "axios": "^1.7.4",
       "bootstrap": "^5.2.3",
       "colors-generator": "^0.3.4",
       "colorsys": "^1.0.22",
