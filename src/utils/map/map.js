@@ -49,13 +49,13 @@ function createSelectedFeaturesLayer() {
 }
 
 async function createTileLayer(epsgCode) {
-   /*let tileLayer = await createTileLayerWMTS(epsgCode);
+   let tileLayer = await createTileLayerWMTS(epsgCode);
 
    if (tileLayer === null) {
       tileLayer = createTileLayerWMS();
-   }*/
+   }
 
-   const tileLayer = createTileLayerWMS();
+   //const tileLayer = createTileLayerWMS();
    tileLayer.set('id', 'baseMap');
 
    return tileLayer;
@@ -121,7 +121,7 @@ export async function createMap(mapDocument) {
       interactions: defaultInteractions().extend([new DragRotateAndZoom()]),
    });
 
-   const epsgCode = mapDocument.epsg.epsgCode2d;
+   const epsgCode = mapDocument.epsg.code2d;
    
    if (baseMapEpsgCodes.includes(epsgCode)) {
       map.addLayer(await createTileLayer(epsgCode));
